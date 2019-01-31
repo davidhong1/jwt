@@ -39,7 +39,7 @@ public class UserController {
         String pw = req.get("pw");
         String contact = req.get("contact");
         if (username==null || pw==null || contact==null)
-            throw  new CustomException("参数错误", HttpStatus.BAD_REQUEST);
+            throw new CustomException("参数错误", HttpStatus.BAD_REQUEST);
         userService.signup(username, contact, pw);
         return new BRB(BRStatus.SUCCESS);
     }
@@ -58,7 +58,7 @@ public class UserController {
     }
 
     @GetMapping(value = "/me")
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_CLIENT')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public User whoami(HttpServletRequest req) {
         return userService.whoami(req);
     }
