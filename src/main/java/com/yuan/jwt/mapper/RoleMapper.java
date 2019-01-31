@@ -11,7 +11,7 @@ import java.util.List;
 public interface RoleMapper extends Mapper<Role> {
 
     @Select("select id from role where role = #{role}")
-    Integer selectIdByRole(String role);
+    Long selectIdByRole(String role);
 
     /**
      * 通过用户ID获取用户角色列表

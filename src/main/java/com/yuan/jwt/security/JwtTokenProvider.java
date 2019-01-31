@@ -6,7 +6,6 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -50,14 +49,23 @@ public class JwtTokenProvider {
         secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
     }
 
+    /**
+     * 用户登录时，用于创建jwt
+     * @param username
+     * @param roles
+     * @return
+     */
     public String createToken(String username, List<RoleSecurity> roles) {
 
         Claims claims = Jwts.claims().setSubject(username);
+        // claims存储role字符串链表
         claims.put("auth", roles.stream().map(s -> new SimpleGrantedAuthority(s.getAuthority())).filter(Objects::nonNull).collect(Collectors.toList()));
 
         Date now = new Date();
+        // 设置jwt过期时间
         Date validity = new Date(now.getTime() + validityInMilliseconds);
 
+        // 根据claims、当前时间、过期时间，使用HS256加密算法生成jwt
         return Jwts.builder()//
                 .setClaims(claims)//
                 .setIssuedAt(now)//
@@ -66,15 +74,18 @@ public class JwtTokenProvider {
                 .compact();
     }
 
+    // 获取用户名字并通过姓名获取用户角色信息
     public Authentication getAuthentication(String token) {
         UserDetails userDetails = myUserDetails.loadUserByUsername(getUsername(token));
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
+    // 从token中获取用户名字
     public String getUsername(String token) {
         return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();
     }
 
+    // 从请求头中获取token
     public String resolveToken(HttpServletRequest req) {
         String bearerToken = req.getHeader("Authorization");
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
@@ -83,6 +94,7 @@ public class JwtTokenProvider {
         return null;
     }
 
+    // 验证token是否有效，包括签名是否有效、是否过期
     public boolean validateToken(String token) {
         try {
             Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);

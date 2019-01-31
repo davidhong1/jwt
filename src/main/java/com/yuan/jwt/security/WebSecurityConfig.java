@@ -47,7 +47,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     /**
-     * BCrypt加密类
+     * BCrypt密码加密类
      * @return
      */
     @Bean
@@ -55,7 +55,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder(12);
     }
 
-    /*
+    /**
      * 注入AuthenticationManager类
      */
     @Bean(name = BeanIds.AUTHENTICATION_MANAGER)
