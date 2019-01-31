@@ -18,6 +18,7 @@ import java.util.Map;
  * @date: 2019-01-21
  * @description:
  */
+@CrossOrigin
 @RestController
 @RequestMapping("/users")
 public class UserController {
@@ -59,8 +60,10 @@ public class UserController {
 
     @GetMapping(value = "/me")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
-    public User whoami(HttpServletRequest req) {
-        return userService.whoami(req);
+    public BRB whoami(HttpServletRequest req) {
+        User user = userService.whoami(req);
+        user.setPw(null);
+        return new BRB(BRStatus.SUCCESS, user);
     }
 
 }
